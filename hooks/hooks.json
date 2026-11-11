@@ -1,0 +1,18 @@
+{
+  "description": "compact-pro: load the handoff at session start, back up transcripts before compaction and at session end, nudge at long contexts. Every hook is a no-op in projects that have never run /compact-pro.",
+  "hooks": {
+    "SessionStart": [
+      { "matcher": "startup|clear", "hooks": [{ "type": "command", "command": "sh \"${CLAUDE_PLUGIN_ROOT}/skills/compact-pro/scripts/run.sh\" session_start.py", "timeout": 15 }] },
+      { "matcher": "compact", "hooks": [{ "type": "command", "command": "sh \"${CLAUDE_PLUGIN_ROOT}/skills/compact-pro/scripts/run.sh\" session_start.py --compact", "timeout": 15 }] }
+    ],
+    "PreCompact": [
+      { "hooks": [{ "type": "command", "command": "sh \"${CLAUDE_PLUGIN_ROOT}/skills/compact-pro/scripts/run.sh\" backup.py --hook", "timeout": 120 }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "sh \"${CLAUDE_PLUGIN_ROOT}/skills/compact-pro/scripts/run.sh\" backup.py --hook", "timeout": 120 }] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": "sh \"${CLAUDE_PLUGIN_ROOT}/skills/compact-pro/scripts/run.sh\" nudge.py", "timeout": 10 }] }
+    ]
+  }
+}
