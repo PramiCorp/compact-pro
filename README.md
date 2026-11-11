@@ -168,6 +168,8 @@ the hook does the rest.
 | `COMPACT_PRO_DIR` | `docs/handoff` | Handoff folder, relative to the project root |
 | `COMPACT_PRO_NUDGE_AT` | `120000` | Context size at which the reminder starts (`0` turns it off) |
 | `COMPACT_PRO_NUDGE_STEP` | `40000` | Growth between reminders |
+| `COMPACT_PRO_AUTO` | off | `1` makes Claude run Compact Pro by itself at safe points (desktop app), instead of suggesting it |
+| `COMPACT_PRO_AUTO_AT` | `200000` | Context size at which auto mode starts asking Claude to run it |
 
 ## Privacy and security
 
