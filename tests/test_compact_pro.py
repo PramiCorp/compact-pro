@@ -149,6 +149,22 @@ class Workspace(unittest.TestCase):
         self.assertIn("about 150k tokens", first)
         self.assertEqual(second, "")
 
+    def test_nudge_auto_mode(self):
+        def transcript(tokens):
+            return write_transcript(Path(self.tmp.name) / f"t{tokens}.jsonl", [
+                {"type": "assistant", "message": {"role": "assistant", "content": [],
+                                                  "usage": {"input_tokens": 5, "cache_read_input_tokens": tokens}}}])
+        state = Path(self.tmp.name) / "state.json"
+        with mock.patch.object(nudge, "STATE", state), mock.patch.object(nudge, "AUTO", True):
+            small = json.dumps({"cwd": str(self.project), "session_id": "a", "transcript_path": str(transcript(150_000))})
+            big = json.dumps({"cwd": str(self.project), "session_id": "a", "transcript_path": str(transcript(250_000))})
+            self.assertEqual(self.run_main(nudge, [], stdin=small), "")        # below the auto threshold: quiet
+            first = self.run_main(nudge, [], stdin=big)
+            again = self.run_main(nudge, [], stdin=big)
+        self.assertIn('with args "auto"', first)
+        self.assertNotIn("suggest", first)
+        self.assertEqual(first, again)                                          # repeats until it runs
+
 
     def test_report_compares_with_compact(self):
         folder = Path(self.tmp.name) / "transcripts"
