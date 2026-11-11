@@ -77,7 +77,8 @@ this conversation knows about.
 
 ## 3. Write `HANDOFF.md` from scratch
 
-Read the current `HANDOFF.md` if there is one, keep what is still true, and rewrite the whole file. Never
+First run step 4's backup command once. It copies the current `HANDOFF.md` into `history/` before you
+replace it. Then read the current `HANDOFF.md`, keep what is still true, and rewrite the whole file. Never
 append. Aim for 80–150 lines, about 2,000 tokens. Write plain sentences with exact names, and date anything
 time-bound. Use these sections:
 
@@ -104,7 +105,7 @@ copy them.
 python "SKILL_DIR/scripts/backup.py" "PROJECT" <session id>
 ```
 
-Use the session id when you know it: the transcript's file name. The desktop app's `get_session("self")` reports
+Run it again here, after the handoff is written, so the backup holds the whole session. Use the session id when you know it: the transcript's file name. The desktop app's `get_session("self")` reports
 it with a `local_` prefix that isn't part of the file name, so omit it if unsure. Without it, the
 script takes the transcript being written right now. Check that it printed the backup name, entry count and
 masked count. The script keeps all text, drops images and the app's duplicate copies, masks secrets, saves
