@@ -3,18 +3,22 @@ on: [push, pull_request]
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python: ["3.8", "3.12"]
-        exclude:
-          - os: macos-latest
-            python: "3.8"
+        python: ["3.10", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m unittest discover -s tests -v
-      - name: JSON manifests parse
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Manifests parse
         run: python -c "import json;[json.load(open(f)) for f in ('.claude-plugin/plugin.json','.claude-plugin/marketplace.json','hooks/hooks.json')]"
+      - name: Python 3.8 syntax
+        run: python -c "import ast,pathlib;[ast.parse(p.read_text(encoding='utf-8'),feature_version=(3,8)) for p in pathlib.Path('.').rglob('*.py')]"
+      - name: Launcher finds Python and hooks stay silent outside a handoff project
+        shell: bash
+        run: echo '{"cwd":"."}' | sh skills/compact-pro/scripts/run.sh session_start.py
