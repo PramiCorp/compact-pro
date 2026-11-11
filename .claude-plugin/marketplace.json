@@ -1,0 +1,14 @@
+{
+  "name": "prami",
+  "owner": { "name": "Prami Corporation", "url": "https://github.com/PramiCorp" },
+  "metadata": { "description": "Claude Code plugins by Prami Corporation" },
+  "plugins": [
+    {
+      "name": "compact-pro",
+      "source": "./",
+      "description": "Deep compaction: handoff file + searchable transcript backup + clean session, with a mid-task safety gate.",
+      "version": "1.0.0",
+      "category": "productivity"
+    }
+  ]
+}
