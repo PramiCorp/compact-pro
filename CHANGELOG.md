@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 — 2026-11-11
+
+- The skill backs up before rewriting the handoff, so `history/` always gets the previous handoff, not the new one.
+
 ## 1.1.0 — 2026-11-11
 
 - Savings report after every run (`scripts/report.py`). It is measured from the transcripts' real token counts:
