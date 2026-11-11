@@ -79,7 +79,8 @@ this conversation knows about.
 
 First run step 4's backup command once. It copies the current `HANDOFF.md` into `history/` before you
 replace it. Then read the current `HANDOFF.md`, keep what is still true, and rewrite the whole file. Never
-append. Aim for 80–150 lines, about 2,000 tokens. Write plain sentences with exact names, and date anything
+append. Aim for 80–150 lines, about 2,000 tokens, and never over 7 KB: the session-start hook fits everything
+into 9.5 KB, and a longer handoff is cut there. Write plain sentences with exact names, and date anything
 time-bound. Use these sections:
 
 - `# <Project> — handoff (<date time>)`, then one line: "From session <id>. Exact history: the session_*.jsonl
