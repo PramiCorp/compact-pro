@@ -16,6 +16,7 @@ sys.path.insert(0, str(SCRIPTS))
 
 import backup  # noqa: E402
 import nudge  # noqa: E402
+import report  # noqa: E402
 import search  # noqa: E402
 import session_start  # noqa: E402
 
@@ -129,6 +130,21 @@ class Workspace(unittest.TestCase):
             second = self.run_main(nudge, [], stdin=payload)
         self.assertIn("about 150k tokens", first)
         self.assertEqual(second, "")
+
+
+    def test_report_compares_with_compact(self):
+        folder = Path(self.tmp.name) / "transcripts"
+        folder.mkdir()
+        usage = lambda n: {"type": "assistant", "message": {"role": "assistant", "content": [], "usage": {"input_tokens": 0, "cache_read_input_tokens": n}}}
+        write_transcript(folder / "old.jsonl", [usage(100_000), usage(300_000),
+                                                {"type": "user", "isCompactSummary": True, "message": {"role": "user", "content": "summary"}},
+                                                usage(130_000)])
+        current = write_transcript(folder / "cur.jsonl", [usage(100_000), usage(400_000)])
+        backup.backup(self.project, self.transcript)
+        out = self.run_main(report, [str(self.project), str(current)])
+        self.assertIn("context 400k", out)
+        self.assertIn("carries ~30k, median of 1 measured", out)   # 130k after compact - 100k baseline
+        self.assertIn("/compact would have left ~130k", out)
 
 
 if __name__ == "__main__":
