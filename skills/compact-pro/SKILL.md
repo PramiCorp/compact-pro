@@ -5,7 +5,8 @@ description: >
   question), it writes the session's state to docs/handoff/HANDOFF.md and backs up the full transcript next
   to it as slim, searchable, secret-masked JSONL. Then it clears the session, so the next one starts from a
   ~2k-token handoff instead of a 25k-45k-token compact summary. It refuses to clear mid-task unless given
-  "force". Use when the user types /compact-pro or asks for Compact Pro, a deep compact, or a handoff and clear.
+  "force". Use when the user types /compact-pro or asks for Compact Pro, a deep compact, or a handoff and clear,
+  or with args "auto" when a "[compact-pro auto]" hook line asks for it.
 ---
 
 # /compact-pro
@@ -20,7 +21,28 @@ project root, the folder holding the code, `docs/` and `CLAUDE.md` (walk up from
 folder is `PROJECT/docs/handoff` unless `COMPACT_PRO_DIR` sets another path relative to the project.
 
 Run every step in order without asking questions. The user typed one command and expects it done. Never run
-`/compact-pro` on your own initiative. Only suggest it in one line, at a safe point.
+`/compact-pro` on your own initiative. Only suggest it in one line, at a safe point. The one exception is auto
+mode, below.
+
+## Auto mode (args `auto`)
+
+Opt-in: the user sets `COMPACT_PRO_AUTO=1`. Then the UserPromptSubmit hook adds a `[compact-pro auto]` line
+once the context is large, and you invoke this skill yourself with args `auto` as the last step of a turn,
+after the user's request is done and before your closing message. Everything below applies, with these
+differences:
+
+- **Strict gate, silent skip.** If any check in step 0 fails, stop at once and say nothing about it: no
+  "finishing first", no partial steps 2–5, never `force`. The hook asks again on the next prompt.
+- **Desktop app only.** If `mcp__ccd_session_mgmt__clear_session` isn't available (terminal or IDE), stop
+  silently.
+- **Short italic note.** In step 6, instead of the three report lines and the summary, end your closing
+  message with this note in italics, filling in the numbers from `report.py`:
+
+  *Compact Pro has been applied automatically to keep this session efficient (context Xk → ~Yk tokens). Our
+  conversation is fully saved and nothing has been lost; you can refer to anything we discussed at any time.
+  If the chat appears cleared, that is expected: we continue exactly where we left off.*
+- **The user's request comes first.** Your closing message still answers what the user asked, in full; the
+  italic note goes at its end. The next session gets that answer back through "Where we left off".
 
 ## 0. Gate: is this a safe point to clear?
 
@@ -134,7 +156,8 @@ It prints three lines, all from the transcripts' real token counts:
 - what `/compact` would have left, based on the median of this project's measured compactions;
 - how many fewer tokens every later turn carries.
 
-Show those three lines to the user word for word, then say in one or two lines what was saved: the handoff,
+In auto mode, show only the italic note described under "Auto mode". Otherwise show those three lines to the
+user word for word, then say in one or two lines what was saved: the handoff,
 and the backup's name and size. Say that the session clears now. Then, as the very last action:
 
 - **Claude desktop app:** call `mcp__ccd_session_mgmt__clear_session` with `session_id: "self"`. Load it
