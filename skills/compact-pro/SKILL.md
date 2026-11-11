@@ -104,7 +104,8 @@ copy them.
 python "SKILL_DIR/scripts/backup.py" "PROJECT" <session id>
 ```
 
-Use the session id when you know it (the desktop app's `get_session("self")` reports it). Without it, the
+Use the session id when you know it: the transcript's file name. The desktop app's `get_session("self")` reports
+it with a `local_` prefix that isn't part of the file name, so omit it if unsure. Without it, the
 script takes the transcript being written right now. Check that it printed the backup name, entry count and
 masked count. The script keeps all text, drops images and the app's duplicate copies, masks secrets, saves
 the previous handoff in `history/`, and adds a `.gitignore` that keeps backups out of git. If the project
@@ -118,10 +119,21 @@ python "SKILL_DIR/scripts/session_start.py"
 
 Run it from PROJECT. It must print the new handoff and a "Where we left off" block.
 
-## 6. Clear
+## 6. Report and clear
 
-In two or three lines, tell the user what was saved: the handoff, the backup's name and size, and that the
-session clears now. Then, as the very last action:
+Measure the savings, the way `/compact` reports what it freed:
+
+```bash
+python "SKILL_DIR/scripts/report.py" "PROJECT" <session id>
+```
+
+It prints three lines, all from the transcripts' real token counts:
+- the context before and after;
+- what `/compact` would have left, based on the median of this project's measured compactions;
+- how many fewer tokens every later turn carries.
+
+Show those three lines to the user word for word, then say in one or two lines what was saved: the handoff,
+and the backup's name and size. Say that the session clears now. Then, as the very last action:
 
 - **Claude desktop app:** call `mcp__ccd_session_mgmt__clear_session` with `session_id: "self"`. Load it
   with ToolSearch (`select:mcp__ccd_session_mgmt__clear_session`) if it is deferred. The clear happens when
