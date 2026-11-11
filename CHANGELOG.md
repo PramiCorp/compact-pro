@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2 — 2026-11-11
+
+- The session-start text stays under Claude Code's 10,000-character hook limit (budget 9,500 bytes). Above it,
+  Claude Code showed only a 2 KB preview, so most of the handoff never reached the new session. "Where we left off"
+  now shrinks to fit, and a handoff too long on its own is cut at a line with a pointer to the file.
+
 ## 1.1.1 — 2026-11-11
 
 - The skill backs up before rewriting the handoff, so `history/` always gets the previous handoff, not the new one.
