@@ -112,6 +112,24 @@ class Workspace(unittest.TestCase):
         self.assertIn("backed up word for word", compact)
         self.assertNotIn("Next: ship it.", compact)
 
+    def test_session_start_fits_the_hook_limit(self):
+        backup.backup(self.project, self.transcript)
+        handoff = self.project / "docs" / "handoff" / "HANDOFF.md"
+        stdin = json.dumps({"cwd": str(self.project)})
+
+        handoff.write_text("# Handoff\n" + "Rule — keep this exact line.\n" * 200, encoding="utf-8")  # ~6.4 KB
+        start = self.run_main(session_start, [], stdin=stdin)
+        self.assertLessEqual(session_start.size(start), session_start.BUDGET + 2)
+        self.assertNotIn("handoff cut", start)                 # the handoff stays whole...
+        self.assertIn("Where we left off", start)              # ..."where we left off" shrinks to fit...
+        self.assertIn("search the backups at once", start)     # ...and the search pointer stays
+
+        handoff.write_text("# Handoff\n" + "Rule — keep this exact line.\n" * 600, encoding="utf-8")  # ~18 KB
+        start = self.run_main(session_start, [], stdin=stdin)
+        self.assertLessEqual(session_start.size(start), session_start.BUDGET + 2)
+        self.assertIn(f"read the rest now: {handoff.as_posix()}", start)
+        self.assertIn("search the backups at once", start)
+
     def test_hooks_silent_without_handoff(self):
         other = Path(self.tmp.name) / "other"
         other.mkdir()
