@@ -19,8 +19,12 @@ session one search away.
 ```text
 > /compact-pro
 
-Saved docs/handoff/HANDOFF.md (1.9k tokens) and session_2026-11-11_a5e4e704.jsonl
-(26.1 MB transcript -> 4.9 MB, 44 secrets masked). Clearing the session now.
+Compact Pro: context 448k -> ~145k tokens (saved ~303k).
+/compact would have left ~171k (saved ~277k; it carries ~28k, median of 6 measured /compact runs here).
+Compact Pro carries ~2.4k instead: ~26k fewer tokens on every following turn (91% less than /compact).
+
+Saved docs/handoff/HANDOFF.md and session_2026-11-10_a5e4e704.jsonl
+(26 MB transcript -> 5 MB, 44 secrets masked). Clearing the session now.
 ```
 
 ## Why
@@ -149,6 +153,10 @@ Uninstall with `python install.py --uninstall`. Your handoffs and backups stay w
 |---|---|
 | `/compact-pro` | Gate → handoff → backup → clear |
 | `/compact-pro force` | Clear even mid-task, after writing a detailed "In progress" section |
+
+Every run ends with a **savings report** measured from your own transcripts (`scripts/report.py`). It gives the
+context before and after, what `/compact` would have left (the median of the compactions measured in that
+project), and the tokens saved on every later turn.
 
 In the **desktop app** the session clears itself. In the **terminal**, Claude finishes with "Type `/clear`";
 the hook does the rest.

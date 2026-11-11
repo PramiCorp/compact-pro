@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0 — 2026-11-11
+
+- Savings report after every run (`scripts/report.py`). It is measured from the transcripts' real token counts:
+  - the context before and after;
+  - what `/compact` would have left, from the median of this project's measured compactions;
+  - the tokens saved on every later turn.
+
 ## 1.0.0 — 2026-11-11
 
 First release.
