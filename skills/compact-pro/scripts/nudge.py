@@ -4,6 +4,10 @@ the next safe point. It never compacts or clears anything itself.
 The size is the real one: the last reply's input + cache-read + cache-write tokens from the transcript. It
 speaks once per COMPACT_PRO_NUDGE_STEP tokens (default 40k) of growth past COMPACT_PRO_NUDGE_AT (default
 120k), and only in projects that have a handoff.
+
+Auto mode (COMPACT_PRO_AUTO=1, opt-in): no suggestions. Once the context passes COMPACT_PRO_AUTO_AT (default
+200k), every prompt gets one line asking Claude to run the skill itself with "auto" at the end of the turn. The
+skill checks the safe-point gate and skips quietly when it isn't one, so the line repeats until it runs.
 """
 from __future__ import annotations
 
@@ -18,6 +22,8 @@ from _common import find_project, read_hook_input  # noqa: E402
 
 START = int(os.environ.get("COMPACT_PRO_NUDGE_AT", "120000"))
 STEP = int(os.environ.get("COMPACT_PRO_NUDGE_STEP", "40000"))
+AUTO = os.environ.get("COMPACT_PRO_AUTO", "").strip().lower() in ("1", "true", "yes", "on")
+AUTO_AT = int(os.environ.get("COMPACT_PRO_AUTO_AT", "200000"))
 STATE = Path(os.environ.get("COMPACT_PRO_STATE", Path(tempfile.gettempdir()) / "compact-pro-nudge.json"))
 
 
@@ -46,6 +52,14 @@ def main() -> None:
     if not path.is_file() or not find_project(data.get("cwd")):
         return
     tokens = context_tokens(path)
+    if AUTO:
+        if AUTO_AT > 0 and tokens >= AUTO_AT:
+            print(f"[compact-pro auto] This session's context is about {tokens // 1000}k tokens. Do the user's "
+                  f"request first. When it is finished and verified, and nothing is running or awaiting the user, "
+                  f"invoke the compact-pro skill yourself with args \"auto\" as the last step of this turn, before "
+                  f"your closing message. Don't ask the user. It checks the safe-point gate and skips quietly if "
+                  f"this isn't one. Never start it mid-task.")
+        return
     if tokens < START:
         return
     level = (tokens - START) // STEP
