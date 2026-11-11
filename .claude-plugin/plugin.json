@@ -1,6 +1,6 @@
 {
   "name": "compact-pro",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Deep compaction for Claude Code: a ~2k-token handoff file plus a searchable, secret-masked transcript backup, then a clean session. Carries 90%+ fewer tokens than /compact, with a safety gate that refuses to clear mid-task.",
   "author": { "name": "Prami Corporation", "url": "https://github.com/PramiCorp" },
   "homepage": "https://github.com/PramiCorp/compact-pro",
